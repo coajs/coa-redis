@@ -31,26 +31,26 @@ cluster-key-slot@^1.1.0:
   resolved "https://registry.npmjs.org/cluster-key-slot/-/cluster-key-slot-1.1.0.tgz#30474b2a981fb12172695833052bc0d01336d10d"
   integrity sha512-2Nii8p3RwAPiFwsnZvukotvow2rIHM+yQ6ZcBXGHdniadkYGZYiGmkHJIbZPIV9nfv7m/U1IPMVVcAhoWFeklw==
 
-coa-echo@^1.0.8:
+coa-echo@*:
   version "1.0.8"
   resolved "https://registry.npmjs.org/coa-echo/-/coa-echo-1.0.8.tgz#0347b947d37d68d03b9058f822dc0f65499210a8"
   integrity sha512-0ap+N+merkETH4QzP81GTUv96t7SWfwiYrhhxW+kmR6Te7GculaklomRsmgBN//5lIif5Gd/OCt8l8r7igrfMA==
 
-coa-env@^1.0.2:
+coa-env@*:
   version "1.0.2"
   resolved "https://registry.npmjs.org/coa-env/-/coa-env-1.0.2.tgz#fe8de04b88a53503b92c904bbb7de49aa72f704e"
   integrity sha512-H6Ozw3WpB+cCxzNmvZgx2sHf/e0fMxanCKqT7z9tzLRm/A3MSa9hYbHf9N03yTCOFCrFid4seELsN9s0yQnMJg==
   dependencies:
     extend2 "^1.0.0"
 
-coa-error@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.npmjs.org/coa-error/-/coa-error-1.0.2.tgz#dd492625079f8da7ba25fd9b3b6f2208a18c6515"
-  integrity sha512-EzusOoiCcWhP36JenBjKVqTNrJ6W7IwPeg9PtO9a+ESJ7S0gGnwkscAtT3y0zQlHJwDdMDNx8IhZVVRA4rllqg==
+coa-error@*:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/coa-error/-/coa-error-1.0.3.tgz#072f8b1c4dcfbc5d031d34ba0f65c8c169edbc6b"
+  integrity sha512-hXcLMNgwrUxlDYuVyPhoj0Dh43W4D/S0u/yOOFoTe61r2VhRFle3vpiIbTqL200BUdqo2O4lHSobatYJFXGesw==
   dependencies:
-    coa-echo "^1.0.8"
+    coa-echo "*"
 
-coa-helper@^1.0.5:
+coa-helper@*:
   version "1.0.5"
   resolved "https://registry.npmjs.org/coa-helper/-/coa-helper-1.0.5.tgz#e7c2599677411f8014d682bff420f929f54924e0"
   integrity sha512-92cJn/904pKeQdTZjkh15DVW/b3RufroA+4owxOVdY404NMmizXIBrCPSRCeE1l3PW2ws5qLVWZ2/RTu5N9BAQ==
