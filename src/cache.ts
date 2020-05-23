@@ -2,7 +2,7 @@ import { env } from 'coa-env'
 import { die } from 'coa-error'
 import { _ } from 'coa-helper'
 import redis from './redis'
-import { Dic } from './typing'
+import { Dic } from './typings'
 
 const ms_ttl = 30 * 24 * 3600 * 1000
 const prefix = env.redis.prefix.toString() || 'coa-d0'
