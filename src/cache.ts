@@ -117,7 +117,7 @@ export default new class {
     }
   }
 
-  // 清楚指定命名空间的缓存
+  // 清除指定命名空间的缓存
   async clear (nsp: string = '') {
     const keys = await redis.io.keys(this.key(nsp + '*'))
     return keys.length ? await redis.io.del(...keys) : 0

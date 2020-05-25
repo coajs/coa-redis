@@ -1,6 +1,6 @@
 {
   "name": "coa-redis",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "description": "redis component for coa",
   "keywords": [
     "coajs",
@@ -21,14 +21,16 @@
   },
   "dependencies": {
     "@types/ioredis": "^4.16.2",
-    "coa-echo": "*",
-    "coa-env": "*",
-    "coa-error": "*",
-    "coa-helper": "*",
     "ioredis": "^4.17.1"
   },
   "devDependencies": {
     "@types/node": "^14.0.5",
     "typescript": "^3.9.3"
+  },
+  "peerDependencies": {
+    "coa-echo": "^1.0.8",
+    "coa-env": "^1.0.2",
+    "coa-error": "^1.0.4",
+    "coa-helper": "^1.0.5"
   }
 }
