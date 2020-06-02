@@ -11,6 +11,9 @@ const key_doing_map = prefix + 'doing-map'
 const key_retrying = prefix + 'retrying'
 const sep = '^^'
 
+const escape = (s: string) => Buffer.from(s, 'utf8').toString('base64').replace(/=/g, '')
+const unescape = (s: string) => Buffer.from(s, 'base64').toString('utf8')
+
 export class Queue {
 
   doingJobId = ''
@@ -39,7 +42,7 @@ export class Queue {
 
   // 推送新任务
   async push (name: string, id: string, data = '') {
-    const jobId = data.length ? (name + sep + id + sep + data) : (name + sep + id)
+    const jobId = name + sep + escape(id) + sep + escape(data)
     echo.grey('* Queue: push new job %s', jobId)
     return await redis.io.lpush(key_pending, jobId)
   }
@@ -90,7 +93,7 @@ export class Queue {
     this.doingJobId = jobId
     echo.grey('* Queue: start job %s', jobId)
     const [name, id, data] = jobId.split(sep)
-    await this.worker(name, id, data).catch(e => {
+    await this.worker(name, unescape(id), unescape(data)).catch(e => {
       echo.error('* Queue JobError: %s %s', jobId, e.toString())
     })
 
