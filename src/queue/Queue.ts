@@ -14,7 +14,7 @@ export class Queue {
   private readonly workers: Dic<(id: string, data: string) => Promise<void>>
 
   constructor (name: string) {
-    const prefix = +`${env.redis.prefix}-{aac-queue-${name}-`
+    const prefix = `${env.redis.prefix}-{aac-queue-${name}}-`
     this.K = {
       pending: prefix + 'pending',
       doing: prefix + 'doing',
@@ -83,9 +83,9 @@ export class Queue {
 
   // 推送新任务
   private async push (name: string, id: string, data = '') {
-    const jobId = name + sep + escape(id) + sep + escape(data)
-    echo.grey('* Queue: push new job %s', jobId)
-    return await redis.io.lpush(this.K.pending, jobId)
+    const job = name + sep + id + sep + data
+    echo.grey('* Queue: push new job %s', job)
+    return await redis.io.lpush(this.K.pending, job)
   }
 
   // 开始工作

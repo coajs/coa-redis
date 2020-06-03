@@ -19,7 +19,7 @@ export class Cron {
   constructor (queue: Queue) {
     this.times = {}
     this.workers = {}
-    this.queue = queue.job(id => this.work(id), 'AAC_CRON')
+    this.queue = queue.job(id => this.work(id), 'CRON')
   }
 
   // 添加日程计划
