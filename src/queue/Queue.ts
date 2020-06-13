@@ -7,22 +7,54 @@ import { Dic } from '../typings'
 const D = { lock: false, series: 0 }
 const sep = '^^'
 
+type Keys = { pending: string, doing: string, doing_map: string, retrying: string }
+
+function getKeys (name: string) {
+  const prefix = `${env.redis.prefix}-{aac-queue-${name}}-`
+  return {
+    pending: prefix + 'pending',
+    doing: prefix + 'doing',
+    doing_map: prefix + 'doing-map',
+    retrying: prefix + 'retrying'
+  }
+}
+
 export class Queue {
 
-  private doingJob: string
-  private readonly K: { pending: string, doing: string, doing_map: string, retrying: string }
-  private readonly workers: Dic<(id: string, data: string) => Promise<void>>
+  readonly K: Keys
 
   constructor (name: string) {
-    const prefix = `${env.redis.prefix}-{aac-queue-${name}}-`
-    this.K = {
-      pending: prefix + 'pending',
-      doing: prefix + 'doing',
-      doing_map: prefix + 'doing-map',
-      retrying: prefix + 'retrying'
-    }
+    this.K = getKeys(name)
+  }
+
+  // 推送新任务
+  public async push (name: string, id: string, data: object) {
+    const job = name + sep + id + sep + JSON.stringify(data)
+    echo.grey('* Queue: push new job %s', job)
+    return await redis.io.lpush(this.K.pending, job)
+  }
+
+  // 定义一个新的推送者
+  pusher (name: string) {
+    return (id: string, data: object) => this.push(name, id, data)
+  }
+
+}
+
+export class QueueWorker {
+
+  private doingJob: string
+  private retryAt: number
+  private readonly K: Keys
+  private readonly queue: Queue
+  private readonly workers: Dic<(id: string, data: object) => Promise<void>>
+
+  constructor (queue: Queue) {
+    this.K = queue.K
+    this.queue = queue
     this.workers = {}
     this.doingJob = ''
+    this.retryAt = 0
   }
 
   // 初始化任务，interval为上报间隔，默认为10秒上报一次
@@ -47,15 +79,15 @@ export class Queue {
     }
   }
 
-  // 添加新Job类型
-  job (worker: (id: string, data: string) => Promise<void>, name = `Job${++D.series}`) {
+  // 添加新工作类型
+  on (name: string, worker: (id: string, data: object) => Promise<void>) {
     this.workers[name] = worker
-    const push = (id: string, data = '') => this.push(name, id, data)
-    return { push }
+    return this.queue.pusher(name)
   }
 
   // 检查队列，force是否强制执行，timeout任务上报超时的时间，默认60秒，interval两次执行间隔，默认60秒
-  async retry (force = false, timeout = 60e3, interval = 60e3) {
+  private async retry (force = false, timeout = 60e3, interval = 60e3) {
+
     const now = _.now()
     // 如果60秒内执行过且没有强制执行，则忽略
     const can = await redis.io.set(this.K.retrying, now, 'PX', interval, 'NX')
@@ -81,13 +113,6 @@ export class Queue {
     }
   }
 
-  // 推送新任务
-  private async push (name: string, id: string, data = '') {
-    const job = name + sep + id + sep + data
-    echo.grey('* Queue: push new job %s', job)
-    return await redis.io.lpush(this.K.pending, job)
-  }
-
   // 开始工作
   private async work (job: string) {
 
@@ -109,7 +134,7 @@ export class Queue {
     // 执行Job
     if (worker) {
       try {
-        await worker(id, data)
+        await worker(id, JSON.parse(data))
       } catch (e) {
         echo.error('* Queue JobError: %s %s', job, e.toString())
       }
@@ -125,6 +150,12 @@ export class Queue {
 
   // 定时检查
   private async interval () {
+    const now = _.now()
+    // 每隔60秒重试
+    if (now - this.retryAt > 60e3) {
+      this.retry().then()
+      this.retryAt = now
+    }
     // 如果当前有正在执行的任务，报告最新时间
     if (this.doingJob)
       await redis.io.hset(this.K.doing_map, this.doingJob, _.now())

@@ -1,7 +1,7 @@
 import { echo } from 'coa-echo'
 import { env } from 'coa-env'
 import { _ } from 'coa-helper'
-import { Queue } from '..'
+import { QueueWorker } from '..'
 import redis from '../redis'
 import { Dic } from '../typings'
 import { CronTime } from './CronTime'
@@ -14,16 +14,16 @@ export class Cron {
 
   private readonly times: Dic<string>
   private readonly workers: Dic<() => Promise<void>>
-  private readonly queue: { push: (id: string) => Promise<number> }
+  private readonly push: (id: string, data: object) => Promise<number>
 
-  constructor (queue: Queue) {
+  constructor (queueWorker: QueueWorker) {
     this.times = {}
     this.workers = {}
-    this.queue = queue.job(id => this.work(id), 'CRON')
+    this.push = queueWorker.on('CRON', id => this.work(id))
   }
 
   // 添加日程计划
-  job (time: string, worker: () => Promise<void>) {
+  on (time: string, worker: () => Promise<void>) {
     const id = ++D.series
     this.times[id] = time
     this.workers[id] = worker
@@ -35,7 +35,7 @@ export class Cron {
     const start = _.toInteger(await redis.io.getset(key_cron_last, deadline)) || (deadline - 1000)
     _.forEach(this.times, (time, id) => {
       const next = new CronTime(time, { start, deadline }).next()
-      if (next) this.queue.push(id)
+      if (next) this.push(id, {})
     })
   }
 

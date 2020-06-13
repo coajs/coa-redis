@@ -4,5 +4,5 @@ import redis from './redis'
 
 export { redis, cache, lock }
 export { Cron } from './cron/Cron'
-export { Queue } from './queue/Queue'
+export { Queue, QueueWorker } from './queue/Queue'
 export { RedisEnv } from './typings'
