@@ -49,8 +49,8 @@ export default new class {
   }
 
   // 获取
-  async warp<T> (nsp: string, id: string, worker: () => Promise<T>, ms = ms_ttl) {
-    let result = await this.get(nsp, id)
+  async warp<T> (nsp: string, id: string, worker: () => Promise<T>, ms = ms_ttl, force = false) {
+    let result = force ? undefined : await this.get(nsp, id)
     if (result === undefined) {
       result = await worker()
       ms > 0 && await this.set(nsp, id, result, ms)
@@ -59,8 +59,8 @@ export default new class {
   }
 
   // 获取
-  async mWarp<T> (nsp: string, ids: string[], worker: (ids: string[]) => Promise<T>, ms = ms_ttl) {
-    const result = await this.mGet(nsp, ids)
+  async mWarp<T> (nsp: string, ids: string[], worker: (ids: string[]) => Promise<T>, ms = ms_ttl, force = false) {
+    const result = force ? {} : await this.mGet(nsp, ids)
 
     const newIds = [] as string[]
     _.forEach(ids, id => {
