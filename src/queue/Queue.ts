@@ -85,8 +85,8 @@ export class QueueWorker {
     return this.queue.pusher(name)
   }
 
-  // 检查队列，force是否强制执行，timeout任务上报超时的时间，默认60秒，interval两次执行间隔，默认60秒
-  private async retry (force = false, timeout = 60e3, interval = 60e3) {
+  // 检查队列，force是否强制执行，timeout任务上报超时的时间，默认180秒，interval两次执行间隔，默认60秒
+  private async retry (force = false, timeout = 180e3, interval = 60e3) {
 
     const now = _.now()
     // 如果60秒内执行过且没有强制执行，则忽略
@@ -99,11 +99,11 @@ export class QueueWorker {
     // 遍历map检查是否超时
     _.forEach(doing_map, (time, jobId) => {
       doing_map[jobId] = now - _.toInteger(time)
-      if (doing_map[jobId] >= timeout) retryJobs.push(jobId)
+      if (doing_map[jobId] > timeout) retryJobs.push(jobId)
     })
     // 遍历doing检查是否超时
     _.forEach(doing, jobId => {
-      if (!doing_map[jobId] || doing_map[jobId] >= timeout) retryJobs.push(jobId)
+      if (doing_map[jobId] === undefined || doing_map[jobId] > timeout) retryJobs.push(jobId)
     })
 
     // 如果存在需要重试的任务
@@ -151,14 +151,14 @@ export class QueueWorker {
   // 定时检查
   private async interval () {
     const now = _.now()
+    // 如果当前有正在执行的任务，报告最新时间
+    if (this.doingJob)
+      await redis.io.hset(this.K.doing_map, this.doingJob, now)
     // 每隔60秒重试
     if (now - this.retryAt > 60e3) {
       this.retry().then()
       this.retryAt = now
     }
-    // 如果当前有正在执行的任务，报告最新时间
-    if (this.doingJob)
-      await redis.io.hset(this.K.doing_map, this.doingJob, _.now())
   }
 
 }
