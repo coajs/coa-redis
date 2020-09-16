@@ -24,7 +24,7 @@ export class Cron {
 
   // 添加日程计划
   on (time: string, worker: () => Promise<void>) {
-    const id = ++D.series
+    const id = `${env.version}-${++D.series}`
     this.times[id] = time
     this.workers[id] = worker
   }
