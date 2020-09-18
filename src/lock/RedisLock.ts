@@ -19,6 +19,11 @@ export class RedisLock {
     return await redis.io.set(this.id, this.value, 'PX', this.ms, 'NX')
   }
 
+  async ttl () {
+    const ms = await redis.io.pttl(this.id)
+    return ms > 0 ? ms : 0
+  }
+
   async unlock () {
     return await redis.io.get(this.id) === this.value ? await redis.io.del(this.id) : -1
   }

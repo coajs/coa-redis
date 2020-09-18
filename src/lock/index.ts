@@ -35,4 +35,19 @@ export default new class {
     })
 
   }
+
+  // 节流事务，限制执行频率
+  async throttle<T> (id: string, worker: () => Promise<T>, ms: number) {
+
+    const lock = new RedisLock(id, ms)
+
+    // 判断是否能锁上，如果不能锁上，则按时间等待
+    while (!await lock.lock()) {
+      await $.timeout(await lock.ttl())
+    }
+
+    // 执行操作，无论是否成功不释放锁，等待锁自己释放
+    return await worker()
+
+  }
 }

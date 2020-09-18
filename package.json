@@ -1,6 +1,6 @@
 {
   "name": "coa-redis",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "redis component for coa",
   "keywords": [
     "coajs",
@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "tsc -w",
     "build": "rm -rf dist && tsc && cp package.json dist",
+    "npm-prerelease": "yarn build && yarn version --prerelease && cp package.json README.md dist && cd dist && npm publish",
     "npm-publish": "yarn build && yarn version --patch && cp package.json README.md dist && cd dist && npm publish"
   },
   "dependencies": {
