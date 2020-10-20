@@ -1,37 +1,34 @@
 import { echo } from 'coa-echo'
-import { env } from 'coa-env'
-import { $, _, } from 'coa-helper'
-import redis from '../redis'
-import { Dic } from '../typings'
+import { $, _ } from 'coa-helper'
+import { RedisBin } from '../RedisBin'
+import { Dic, Redis } from '../typings'
 
 const D = { lock: false, series: 0 }
 const sep = '^^'
 
 type Keys = { pending: string, doing: string, doing_map: string, retrying: string }
 
-function getKeys (name: string) {
-  const prefix = `${env.redis.prefix}-{aac-queue-${name}}-`
-  return {
-    pending: prefix + 'pending',
-    doing: prefix + 'doing',
-    doing_map: prefix + 'doing-map',
-    retrying: prefix + 'retrying'
-  }
-}
-
-export class Queue {
+export class RedisQueue {
 
   readonly K: Keys
+  private readonly io: Redis.Redis
 
-  constructor (name: string) {
-    this.K = getKeys(name)
+  constructor (bin: RedisBin, name: string) {
+    const prefix = `${bin.config.prefix}-{aac-queue-${name}}-`
+    this.K = {
+      pending: prefix + 'pending',
+      doing: prefix + 'doing',
+      doing_map: prefix + 'doing-map',
+      retrying: prefix + 'retrying'
+    }
+    this.io = bin.io
   }
 
   // 推送新任务
   public async push (name: string, id: string, data: object) {
     const job = name + sep + id + sep + JSON.stringify(data)
     echo.grey('* Queue: push new job %s', job)
-    return await redis.io.lpush(this.K.pending, job)
+    return await this.io.lpush(this.K.pending, job)
   }
 
   // 定义一个新的推送者
@@ -41,20 +38,22 @@ export class Queue {
 
 }
 
-export class QueueWorker {
+export class RedisQueueWorker {
 
   private doingJob: string
   private retryAt: number
   private readonly K: Keys
-  private readonly queue: Queue
+  private readonly queue: RedisQueue
   private readonly workers: Dic<(id: string, data: object) => Promise<void>>
+  private readonly io: Redis.Redis
 
-  constructor (queue: Queue) {
+  constructor (bin: RedisBin, queue: RedisQueue) {
     this.K = queue.K
     this.queue = queue
     this.workers = {}
     this.doingJob = ''
     this.retryAt = 0
+    this.io = bin.io
   }
 
   // 初始化任务，interval为上报间隔，默认为10秒上报一次
@@ -62,7 +61,7 @@ export class QueueWorker {
     if (D.lock) return
     D.lock = true
 
-    const redis_queue = redis.io.duplicate()
+    const redis_queue = this.io.duplicate()
 
     // 队列任务监听器
     setInterval(() => this.interval().then().catch(_.noop), interval)
@@ -90,10 +89,10 @@ export class QueueWorker {
 
     const now = _.now()
     // 如果60秒内执行过且没有强制执行，则忽略
-    const can = await redis.io.set(this.K.retrying, now, 'PX', interval, 'NX')
+    const can = await this.io.set(this.K.retrying, now, 'PX', interval, 'NX')
     if (!can && !force) return
 
-    const [[, doing = []], [, doing_map = {}]] = await redis.io.pipeline().lrange(this.K.doing, 0, -1).hgetall(this.K.doing_map).exec()
+    const [[, doing = []], [, doing_map = {}]] = await this.io.pipeline().lrange(this.K.doing, 0, -1).hgetall(this.K.doing_map).exec()
     const retryJobs = [] as string[]
 
     // 遍历map检查是否超时
@@ -109,7 +108,7 @@ export class QueueWorker {
     // 如果存在需要重试的任务
     if (retryJobs.length) {
       const uniqJobIds = _.uniq(retryJobs)
-      await redis.io.pipeline().hdel(this.K.doing_map, ...uniqJobIds).lpush(this.K.pending, ...uniqJobIds).exec()
+      await this.io.pipeline().hdel(this.K.doing_map, ...uniqJobIds).lpush(this.K.pending, ...uniqJobIds).exec()
     }
   }
 
@@ -118,7 +117,7 @@ export class QueueWorker {
 
     // 准备执行
     const now = _.now()
-    const can = await redis.io.hsetnx(this.K.doing_map, job, now)
+    const can = await this.io.hsetnx(this.K.doing_map, job, now)
 
     // 如果已经开始，则忽略
     if (!can) return
@@ -144,7 +143,7 @@ export class QueueWorker {
 
     // 执行结束
     this.doingJob = ''
-    await redis.io.pipeline().hdel(this.K.doing_map, job).lrem(this.K.doing, 0, job).exec()
+    await this.io.pipeline().hdel(this.K.doing_map, job).lrem(this.K.doing, 0, job).exec()
     echo.grey('* Queue: job %s completed in %sms', job, _.now() - now)
   }
 
@@ -153,7 +152,7 @@ export class QueueWorker {
     const now = _.now()
     // 如果当前有正在执行的任务，报告最新时间
     if (this.doingJob)
-      await redis.io.hset(this.K.doing_map, this.doingJob, now)
+      await this.io.hset(this.K.doing_map, this.doingJob, now)
     // 每隔60秒重试
     if (now - this.retryAt > 60e3) {
       this.retry().then()

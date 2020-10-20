@@ -1,8 +1,12 @@
+import * as Redis from 'ioredis'
+
+export { Redis }
+
 export interface Dic<T> {
   [key: string]: T
 }
 
-export interface RedisEnv {
+export interface RedisConfig {
   host: string,
   port: number,
   db: number,
@@ -11,8 +15,4 @@ export interface RedisEnv {
   trace: boolean
 }
 
-declare module 'coa-env' {
-  interface Env {
-    redis: RedisEnv
-  }
-}
+export type CacheDelete = [string, string[]]
