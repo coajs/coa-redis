@@ -1,7 +1,6 @@
 import { echo } from 'coa-echo'
-import { env } from 'coa-env'
 import { _ } from 'coa-helper'
-import { RedisQueueWorker } from '../'
+import { RedisQueueWorker } from '../queue/Queue'
 import { RedisBin } from '../RedisBin'
 import { Dic, Redis } from '../typings'
 import { CronTime } from './CronTime'
@@ -14,23 +13,25 @@ export class RedisCron {
   private readonly workers: Dic<() => Promise<void>>
   private readonly push: (id: string, data: object) => Promise<number>
 
+  private readonly version: string
   private readonly prefix: string
   private readonly key_cron_last: string
 
   private readonly io: Redis.Redis
 
-  constructor (bin: RedisBin, worker: RedisQueueWorker) {
+  constructor (bin: RedisBin, worker: RedisQueueWorker, version: string) {
     this.times = {}
     this.workers = {}
     this.push = worker.on('CRON', id => this.work(id))
     this.prefix = bin.config.prefix + '-aac-cron-'
     this.key_cron_last = this.prefix + 'last'
+    this.version = version || ''
     this.io = bin.io
   }
 
   // 添加日程计划
   on (time: string, worker: () => Promise<void>) {
-    const id = `${env.version}-${++D.series}`
+    const id = `${this.version}-${++D.series}`
     this.times[id] = time
     this.workers[id] = worker
   }

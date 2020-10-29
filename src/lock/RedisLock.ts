@@ -1,10 +1,11 @@
-import { env } from 'coa-env'
 import { die } from 'coa-error'
 import { $, _ } from 'coa-helper'
 import { RedisBin } from '../RedisBin'
 import { Redis } from '../typings'
 
 const D = { series: 0 }
+
+const hostname = process.env.hostname || ''
 
 class Lock {
   private readonly id: string
@@ -14,8 +15,8 @@ class Lock {
 
   constructor (bin: RedisBin, id: string, ms: number) {
     this.io = bin.io
-    this.id = bin.config.prefix + '-redis-lock-' + _.snakeCase(id.trim())
-    this.value = env.hostname + (++D.series) + _.random(true)
+    this.id = bin.config.prefix + '-redis-lock-' + _.kebabCase(id.trim())
+    this.value = hostname + (++D.series) + _.random(true)
     this.ms = ms
   }
 

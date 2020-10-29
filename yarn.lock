@@ -10,21 +10,34 @@
     "@types/node" "*"
 
 "@types/lodash@^4.14.152":
-  version "4.14.162"
-  resolved "https://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.162.tgz#65d78c397e0d883f44afbf1f7ba9867022411470"
-  integrity sha1-ZdeMOX4NiD9Er78fe6mGcCJBFHA=
+  version "4.14.163"
+  resolved "https://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.163.tgz?cache=0&sync_timestamp=1603910616552&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Flodash%2Fdownload%2F%40types%2Flodash-4.14.163.tgz#6026f73c8267a0b7d41c7c8aadacfa2a5255774f"
+  integrity sha1-YCb3PIJnoLfUHHyKraz6KlJVd08=
 
-"@types/node@*", "@types/node@^14.11.11":
-  version "14.11.11"
-  resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.11.11.tgz#359ea52236b5ccc04a71d4001c8467178a9d3699"
-  integrity sha1-NZ6lIja1zMBKcdQAHIRnF4qdNpk=
+"@types/node@*", "@types/node@^14.14.6":
+  version "14.14.6"
+  resolved "https://registry.npm.taobao.org/@types/node/download/@types/node-14.14.6.tgz#146d3da57b3c636cc0d1769396ce1cfa8991147f"
+  integrity sha1-FG09pXs8Y2zA0XaTls4c+omRFH8=
+
+aggregate-error@^3.0.0:
+  version "3.1.0"
+  resolved "https://registry.npm.taobao.org/aggregate-error/download/aggregate-error-3.1.0.tgz#92670ff50f5359bdb7a3e0d40d0ec30c5737687a"
+  integrity sha1-kmcP9Q9TWb23o+DUDQ7DDFc3aHo=
+  dependencies:
+    clean-stack "^2.0.0"
+    indent-string "^4.0.0"
 
 axios@^0.19.2:
   version "0.19.2"
-  resolved "https://registry.npm.taobao.org/axios/download/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
+  resolved "https://registry.npm.taobao.org/axios/download/axios-0.19.2.tgz?cache=0&sync_timestamp=1603468783865&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Faxios%2Fdownload%2Faxios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
   integrity sha1-PqNsXYgY0NX4qKl6bTa4bNwAyyc=
   dependencies:
     follow-redirects "1.5.10"
+
+clean-stack@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.npm.taobao.org/clean-stack/download/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
+  integrity sha1-7oRy27Ep5yezHooQpCfe6d/kAIs=
 
 cluster-key-slot@^1.1.0:
   version "1.1.0"
@@ -35,13 +48,6 @@ coa-echo@^1.0.8:
   version "1.0.8"
   resolved "https://registry.npm.taobao.org/coa-echo/download/coa-echo-1.0.8.tgz#0347b947d37d68d03b9058f822dc0f65499210a8"
   integrity sha1-A0e5R9N9aNA7kFj4ItwPZUmSEKg=
-
-coa-env@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.npm.taobao.org/coa-env/download/coa-env-1.0.2.tgz#fe8de04b88a53503b92c904bbb7de49aa72f704e"
-  integrity sha1-/o3gS4ilNQO5LJBLu33kmqcvcE4=
-  dependencies:
-    extend2 "^1.0.0"
 
 coa-error@^1.0.4:
   version "1.0.4"
@@ -60,9 +66,9 @@ coa-helper@^1.0.5:
     lodash "^4.17.15"
 
 dayjs@^1.8.27:
-  version "1.9.3"
-  resolved "https://registry.npm.taobao.org/dayjs/download/dayjs-1.9.3.tgz?cache=0&sync_timestamp=1602580746115&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdayjs%2Fdownload%2Fdayjs-1.9.3.tgz#b7f94b22ad2a136a4ca02a01ab68ae893fe1a268"
-  integrity sha1-t/lLIq0qE2pMoCoBq2iuiT/homg=
+  version "1.9.4"
+  resolved "https://registry.npm.taobao.org/dayjs/download/dayjs-1.9.4.tgz?cache=0&sync_timestamp=1603435778328&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fdayjs%2Fdownload%2Fdayjs-1.9.4.tgz#fcde984e227f4296f04e7b05720adad2e1071f1b"
+  integrity sha1-/N6YTiJ/QpbwTnsFcgra0uEHHxs=
 
 debug@=3.1.0:
   version "3.1.0"
@@ -83,11 +89,6 @@ denque@^1.1.0:
   resolved "https://registry.npm.taobao.org/denque/download/denque-1.4.1.tgz#6744ff7641c148c3f8a69c307e51235c1f4a37cf"
   integrity sha1-Z0T/dkHBSMP4ppwwflEjXB9KN88=
 
-extend2@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npm.taobao.org/extend2/download/extend2-1.0.0.tgz#0425a989b4dac2a486a32257f5140103756a7a3c"
-  integrity sha1-BCWpibTawqSGoyJX9RQBA3Vqejw=
-
 follow-redirects@1.5.10:
   version "1.5.10"
   resolved "https://registry.npm.taobao.org/follow-redirects/download/follow-redirects-1.5.10.tgz#7b7a9f9aea2fdff36786a94ff643ed07f4ff5e2a"
@@ -100,17 +101,23 @@ hashids@^2.2.1:
   resolved "https://registry.npm.taobao.org/hashids/download/hashids-2.2.1.tgz#ad0c600f0083aa0df7451dfd184e53db34f71289"
   integrity sha1-rQxgDwCDqg33RR39GE5T2zT3Eok=
 
-ioredis@^4.17.3:
-  version "4.17.3"
-  resolved "https://registry.npm.taobao.org/ioredis/download/ioredis-4.17.3.tgz#9938c60e4ca685f75326337177bdc2e73ae9c9dc"
-  integrity sha1-mTjGDkymhfdTJjNxd73C5zrpydw=
+indent-string@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npm.taobao.org/indent-string/download/indent-string-4.0.0.tgz#624f8f4497d619b2d9768531d58f4122854d7251"
+  integrity sha1-Yk+PRJfWGbLZdoUx1Y9BIoVNclE=
+
+ioredis@^4.19.1:
+  version "4.19.1"
+  resolved "https://registry.npm.taobao.org/ioredis/download/ioredis-4.19.1.tgz#7e2d32d37a3b8703b88263a35fed4ff6a3797b4f"
+  integrity sha1-fi0y03o7hwO4gmOjX+1P9qN5e08=
   dependencies:
     cluster-key-slot "^1.1.0"
     debug "^4.1.1"
     denque "^1.1.0"
     lodash.defaults "^4.2.0"
     lodash.flatten "^4.4.0"
-    redis-commands "1.5.0"
+    p-map "^4.0.0"
+    redis-commands "1.6.0"
     redis-errors "^1.2.0"
     redis-parser "^3.0.0"
     standard-as-callback "^2.0.1"
@@ -140,10 +147,17 @@ ms@2.1.2:
   resolved "https://registry.npm.taobao.org/ms/download/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha1-0J0fNXtEP0kzgqjrPM0YOHKuYAk=
 
-redis-commands@1.5.0:
-  version "1.5.0"
-  resolved "https://registry.npm.taobao.org/redis-commands/download/redis-commands-1.5.0.tgz#80d2e20698fe688f227127ff9e5164a7dd17e785"
-  integrity sha1-gNLiBpj+aI8icSf/nlFkp90X54U=
+p-map@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npm.taobao.org/p-map/download/p-map-4.0.0.tgz#bb2f95a5eda2ec168ec9274e06a747c3e2904d2b"
+  integrity sha1-uy+Vpe2i7BaOySdOBqdHw+KQTSs=
+  dependencies:
+    aggregate-error "^3.0.0"
+
+redis-commands@1.6.0:
+  version "1.6.0"
+  resolved "https://registry.npm.taobao.org/redis-commands/download/redis-commands-1.6.0.tgz#36d4ca42ae9ed29815cdb30ad9f97982eba1ce23"
+  integrity sha1-NtTKQq6e0pgVzbMK2fl5guuhziM=
 
 redis-errors@^1.0.0, redis-errors@^1.2.0:
   version "1.2.0"
@@ -162,7 +176,7 @@ standard-as-callback@^2.0.1:
   resolved "https://registry.npm.taobao.org/standard-as-callback/download/standard-as-callback-2.0.1.tgz#ed8bb25648e15831759b6023bdb87e6b60b38126"
   integrity sha1-7YuyVkjhWDF1m2Ajvbh+a2CzgSY=
 
-typescript@^4.0.3:
-  version "4.0.3"
-  resolved "https://registry.npm.taobao.org/typescript/download/typescript-4.0.3.tgz#153bbd468ef07725c1df9c77e8b453f8d36abba5"
-  integrity sha1-FTu9Ro7wdyXB35x36LRT+NNqu6U=
+typescript@^4.0.5:
+  version "4.0.5"
+  resolved "https://registry.npm.taobao.org/typescript/download/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
+  integrity sha1-rp3d/RBp8ctb6z7zshcN18EzI4k=
