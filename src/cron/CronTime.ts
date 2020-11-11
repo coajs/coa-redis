@@ -1,4 +1,4 @@
-import { die } from 'coa-error'
+import { CoaError } from 'coa-error'
 import { Dic } from '../typings'
 
 const name_map = ['second', 'minute', 'hour', 'date', 'month', 'day']
@@ -52,7 +52,7 @@ export class CronTime {
   // 解析表达式
   private parse (expression: string) {
     const split = expression.trim().split(/\s+/)
-    split.length === 6 || die.hint(`Cron表达式有误，只能有6项`)
+    split.length === 6 || CoaError.throw('CronTime.InvalidExpression', `Cron表达式有误，只能有6项`)
     split.forEach((v, i) => this.parseField(v, i))
   }
 
@@ -74,7 +74,7 @@ export class CronTime {
       return ''
     })
 
-    field === '' || die.hint(`Cron表达式第${index + 1}项${field}有误`)
+    field === '' || CoaError.throw('CronTime.InvalidExpressionField', `Cron表达式第${index + 1}项${field}有误`)
   }
 
 }

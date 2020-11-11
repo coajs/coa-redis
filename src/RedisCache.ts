@@ -1,4 +1,4 @@
-import { die } from 'coa-error'
+import { CoaError } from 'coa-error'
 import { _ } from 'coa-helper'
 import { RedisBin } from './RedisBin'
 import { CacheDelete, Dic, Redis, RedisConfig } from './typings'
@@ -17,7 +17,7 @@ export class RedisCache {
 
   // 设置
   async set (nsp: string, id: string, value: any, ms: number = ms_ttl) {
-    ms > 0 || die.hint('cache hash ms 必须大于0')
+    ms > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
     const expire = _.now() + ms
     const data = this.encode(value, expire)
     return await this.io.hset(this.key(nsp), id, data)
@@ -25,8 +25,8 @@ export class RedisCache {
 
   // 批量设置
   async mSet (nsp: string, values: Dic<any>, ms: number = ms_ttl) {
-    ms > 0 || die.error('cache hash ms 必须大于0')
-    _.keys(values).length > 0 || die.error('cache hash values值的数量 必须大于0')
+    ms > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
+    _.keys(values).length > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash values值的数量 必须大于0')
     const expire = Date.now() + ms
     const data = {} as Dic<any>
     _.forEach(values, (v, k) => data[k] = this.encode(v, expire))

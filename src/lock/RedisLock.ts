@@ -1,4 +1,4 @@
-import { die } from 'coa-error'
+import { CoaError } from 'coa-error'
 import { $, _ } from 'coa-helper'
 import { RedisBin } from '../RedisBin'
 import { Redis } from '../typings'
@@ -66,7 +66,7 @@ export class RedisLock {
     const lock = new Lock(this.bin, id, ms)
 
     // 判断是否能锁上，如果不能锁上，则直接报错
-    await lock.lock() || die.hint('Running')
+    await lock.lock() || CoaError.throw('RedisLock.Running', 'Running')
 
     // 执行操作，无论是否成功均释放锁
     return await worker().finally(() => {
