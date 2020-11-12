@@ -1,12 +1,12 @@
 import { echo } from 'coa-echo'
-import { Redis, RedisConfig } from './typings'
+import { CoaRedis, Redis } from './typings'
 
 export class RedisBin {
 
   public io: Redis.Redis
-  public config: RedisConfig
+  public config: CoaRedis.Config
 
-  constructor (config: RedisConfig) {
+  constructor (config: CoaRedis.Config) {
 
     this.config = config
     this.io = new Redis({

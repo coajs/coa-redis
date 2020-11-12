@@ -2,15 +2,15 @@ import { echo } from 'coa-echo'
 import { _ } from 'coa-helper'
 import { RedisQueueWorker } from '../queue/Queue'
 import { RedisBin } from '../RedisBin'
-import { Dic, Redis } from '../typings'
+import { CoaRedis, Redis } from '../typings'
 import { CronTime } from './CronTime'
 
 const D = { series: 0 }
 
 export class RedisCron {
 
-  private readonly times: Dic<string>
-  private readonly workers: Dic<() => Promise<void>>
+  private readonly times: CoaRedis.Dic<string>
+  private readonly workers: CoaRedis.Dic<() => Promise<void>>
   private readonly push: (id: string, data: object) => Promise<number>
 
   private readonly version: string

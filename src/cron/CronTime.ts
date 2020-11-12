@@ -1,5 +1,5 @@
 import { CoaError } from 'coa-error'
-import { Dic } from '../typings'
+import { CoaRedis } from '../typings'
 
 const name_map = ['second', 'minute', 'hour', 'date', 'month', 'day']
 const range_map = [[0, 59], [0, 59], [0, 23], [1, 31], [0, 11], [0, 6]]
@@ -9,12 +9,12 @@ export class CronTime {
   start: number
   deadline: number
   fields = {
-    second: {} as Dic<boolean>,
-    minute: {} as Dic<boolean>,
-    hour: {} as Dic<boolean>,
-    date: {} as Dic<boolean>,
-    month: {} as Dic<boolean>,
-    day: {} as Dic<boolean>,
+    second: {} as CoaRedis.Dic<boolean>,
+    minute: {} as CoaRedis.Dic<boolean>,
+    hour: {} as CoaRedis.Dic<boolean>,
+    date: {} as CoaRedis.Dic<boolean>,
+    month: {} as CoaRedis.Dic<boolean>,
+    day: {} as CoaRedis.Dic<boolean>,
   }
 
   // 默认结束时间为2099年
