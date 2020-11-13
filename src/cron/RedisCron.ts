@@ -1,7 +1,6 @@
 import { echo } from 'coa-echo'
 import { _ } from 'coa-helper'
-import { RedisQueueWorker } from '../queue/Queue'
-import { RedisBin } from '../RedisBin'
+import { RedisQueueWorker } from '../queue/RedisQueueWorker'
 import { CoaRedis, Redis } from '../typings'
 import { CronTime } from './CronTime'
 
@@ -16,17 +15,16 @@ export class RedisCron {
   private readonly version: string
   private readonly prefix: string
   private readonly key_cron_last: string
-
   private readonly io: Redis.Redis
 
-  constructor (bin: RedisBin, worker: RedisQueueWorker, version: string) {
+  constructor (worker: RedisQueueWorker, version: string) {
     this.times = {}
     this.workers = {}
     this.push = worker.on('CRON', id => this.work(id))
-    this.prefix = bin.config.prefix + '-aac-cron-'
+    this.prefix = worker.queue.bin.config.prefix + '-aac-cron-'
     this.key_cron_last = this.prefix + 'last'
     this.version = version || ''
-    this.io = bin.io
+    this.io = worker.queue.bin.io
   }
 
   // 添加日程计划
@@ -42,7 +40,7 @@ export class RedisCron {
     const start = _.toInteger(await this.io.getset(this.key_cron_last, deadline)) || (deadline - 1000)
     _.forEach(this.times, (time, id) => {
       const next = new CronTime(time, { start, deadline }).next()
-      if (next) this.push(id, {})
+      next && this.push(id, {})
     })
   }
 
