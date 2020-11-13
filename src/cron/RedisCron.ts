@@ -13,7 +13,6 @@ export class RedisCron {
   private readonly push: (id: string, data: object) => Promise<number>
 
   private readonly version: string
-  private readonly prefix: string
   private readonly key_cron_last: string
   private readonly io: Redis.Redis
 
@@ -21,8 +20,7 @@ export class RedisCron {
     this.times = {}
     this.workers = {}
     this.push = worker.on('CRON', id => this.work(id))
-    this.prefix = worker.queue.bin.config.prefix + '-aac-cron-'
-    this.key_cron_last = this.prefix + 'last'
+    this.key_cron_last = worker.queue.keys.prefix + 'cron-last'
     this.version = version || ''
     this.io = worker.queue.bin.io
   }

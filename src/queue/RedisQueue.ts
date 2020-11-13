@@ -5,11 +5,12 @@ import { Redis } from '../typings'
 const sep = '^^'
 
 export namespace RedisQueue {
-  export type Keys = { pending: string, doing: string, doing_map: string, retrying: string }
+  export type Keys = { prefix: string, pending: string, doing: string, doing_map: string, retrying: string }
 }
 
 export class RedisQueue {
 
+  readonly name: string
   readonly keys: RedisQueue.Keys
   readonly bin: RedisBin
   readonly io: Redis.Redis
@@ -17,6 +18,7 @@ export class RedisQueue {
   constructor (bin: RedisBin, name: string) {
     const prefix = `${bin.config.prefix}-{aac-queue-${name}}-`
     this.keys = {
+      prefix,
       pending: prefix + 'pending',
       doing: prefix + 'doing',
       doing_map: prefix + 'doing-map',
@@ -24,6 +26,7 @@ export class RedisQueue {
     }
     this.bin = bin
     this.io = bin.io
+    this.name = name
   }
 
   // 推送新任务
