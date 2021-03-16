@@ -1,37 +1,5 @@
-# coa-redis
-
-[![GitHub license](https://img.shields.io/badge/license-MIT-green.svg?style=flat-square)](LICENSE)
-[![npm version](https://img.shields.io/npm/v/coa-redis.svg?style=flat-square)](https://www.npmjs.org/package/coa-redis)
-[![npm downloads](https://img.shields.io/npm/dm/coa-redis.svg?style=flat-square)](http://npm-stat.com/charts.html?package=coa-redis)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/coajs/coa-redis/pulls)
-
-COA核心Redis数据库组件，包含数据缓存、队列消息、定时任务、分布式锁等
-
-## 特点
-
-- **功能齐全** 基础数据连接基于 [ioredis](https://github.com/luin/ioredis) ，注重性能、功能齐全
-- **简单轻量** 不依赖于其他第三方库（基础连接库ioredis除外）
-- **TypeScript** 全部使用TypeScript书写，类型约束、IDE友好
-
-## 组件
-
-- 数据缓存 [RedisCache](#数据缓存)
-- 队列消息 [RedisQueue](#队列消息) [RedisQueueWorker](#队列消息)
-- 定时任务 [RedisCron](#定时任务)
-- 分布式锁 [RedisLock](#分布式锁)
-
-## 快速开始
-
-### 安装
-
-```shell
-yarn add coa-redis
-```
-
-### 基础配置
-
-```typescript
-import { RedisBin } from 'coa-redis'
+// @ts-nocheck
+import { RedisBin, RedisCache, RedisLock, RedisQueue, RedisQueueWorker } from '.'
 
 const redisConfig = {
   // 服务器地址
@@ -48,18 +16,10 @@ const redisConfig = {
   trace: false
 }
 
-// 创建一个配置实例，后续所有的组件的使用均依赖此配置实例
-// 一般一个数据库只需要使用一个实例，内部会管理连接池
+// 创建一个基础配置实例，后续所有的组件的使用均依赖此配置实例
+// 一般一个数据库只需要使用一个实例，内部会管理连接池，无需创建多个
 const redisBin = new RedisBin(redisConfig)
-```
 
-### 组件使用
-
-#### 数据缓存
-
-基本使用
-
-```typescript
 // 创建一个缓存实例
 const redisCache = new RedisCache(redisBin)
 
@@ -68,32 +28,25 @@ const redisCache = new RedisCache(redisBin)
 
 // 设置缓存数据
 await redisCache.set('module1', 'id001', 'value001', 5 * 60 * 1000/*5分钟*/) // 1
+await redisCache.set('module1', 'id002', { name: 'A', title: 'a' }, 5 * 60 * 1000/*5分钟*/) // 1
 
 // 读取缓存数据
-await redisCache.get('module1', 'id001') // value001
+await redisCache.get('module1', 'id001') // 'value001'
+await redisCache.get('module1', 'id002') // { name: 'A', title: 'a' }
 
 // 删除缓存数据（支持删除同一个nsp下的多条数据）
 await redisCache.delete('module1', ['id001', 'id002']) // 2
-```
 
-批量操作
-
-```typescript
 // 批量设置缓存数据
 await redisCache.mSet('module1', { id101: 'value101' }, 5 * 60 * 1000/*5分钟*/) // 1
 await redisCache.mSet('module2', { id201: 'value201', id202: { name: 'A2', title: 'a2' } }, 5 * 60 * 1000/*5分钟*/) // 2
 
 // 批量读取缓存数据
 await redisCache.mGet('module1', ['id101']) // 'value101'
-await redisCache.mGet('module2', ['id201', 'id202']) // { id201: 'value201', id202: { name: 'A2', title: 'a2' } 
+await redisCache.mGet('module2', ['id201', 'id202']) // { id201: 'value201', id202: { name: 'A2', title: 'a2' }
 
 // 批量删除缓存数据（支持删除不同nsp下的多条数据）
 await redisCache.mDelete([['module1', ['id101']], ['module2', ['id201', 'id202']]]) // 3
-```
-
-语法糖
-
-```typescript
 
 // 获取缓存信息，如果不存在则按照方法读取并保存
 const resultWarp1 = await redisCache.warp('module1', 'id301', () => {
@@ -125,11 +78,7 @@ const resultWarp2 = await redisCache.mWarp('module1', ['id301', 'id302'], (ids) 
 }, 10 * 60 * 1000/*10分钟*/)
 
 resultWarp2 // { id301: 0.32430600236596074, id302: 0.29829421673682566 }
-```
 
-#### 队列消息
-
-```typescript
 // 定义一个队列名称和消息类型名称
 const QUEUE_NAME_1 = 'CHANNEL-1', MESSAGE_NAME_1 = 'NORMAL-MESSAGE-1'
 
@@ -144,33 +93,24 @@ worker.on(MESSAGE_NAME_1, async (id, data) => {
 
 // 生产一个消息
 await queue.push(MESSAGE_NAME_1, 'message-id-001', { value: '001' }) // 1
-```
 
-#### 定时任务
-
-```typescript
 // 定时任务依赖于消息队列的消费者，同时要指定版本号避免版本升级瞬间任务冲突
 const cron = new RedisCron(quque.worker, env.version)
 
 // 每天10、16点执行
-cron.on('0 0 10,16 * * *', () => { /**做一些事情**/ })
+cron.on('0 0 10,16 * * *', () => { /*做一些事情*/ })
 
 // 每天0:30执行
-cron.on('0 30 0 * * *', () => { /**做一些事情**/ })
+cron.on('0 30 0 * * *', () => { /*做一些事情*/ })
 
 // 每10分钟执行
-cron.on('0 */10 * * * *', () => { /**做一些事情**/ })
+cron.on('0 */10 * * * *', () => { /*做一些事情*/ })
 
 // 每周一周三周五0点执行
-cron.on('0 0 0 * * 1,3,5', () => { /**做一些事情**/ })
+cron.on('0 0 0 * * 1,3,5', () => { /*做一些事情*/ })
 
 // 每月1日、16日的0点执行
-cron.on('0 0 0 1,16 * *', () => { /**做一些事情**/ })
-```
-
-#### 分布式锁
-
-```typescript
+cron.on('0 0 0 1,16 * *', () => { /*做一些事情*/ })
 
 // 创建锁方法实例
 const redisLock = new RedisLock(redisBin)
@@ -189,4 +129,10 @@ await redisLock.try('lock-for-user-register', () => {
 await redisLock.throttle('lock-for-user-register', () => {
   // 做一些事情，这个事情不会并发执行
 }, 1000 /*1秒钟*/)
-```
+
+
+
+
+
+
+
