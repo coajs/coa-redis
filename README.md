@@ -5,20 +5,20 @@
 [![npm downloads](https://img.shields.io/npm/dm/coa-redis.svg?style=flat-square)](http://npm-stat.com/charts.html?package=coa-redis)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/coajs/coa-redis/pulls)
 
-COA核心Redis数据库组件，包含数据缓存、队列消息、定时任务、分布式锁等
+COA核心Redis数据库组件，包含数据缓存、消息队列、定时任务、分布式锁等
 
 ## 特点
 
 - **功能齐全** 基础数据连接基于 [ioredis](https://github.com/luin/ioredis) ，注重性能、功能齐全
-- **简单轻量** 不依赖于其他第三方库（基础连接库ioredis除外）
+- **简单轻量** 仅几百行代码，不依赖于其他第三方库
 - **TypeScript** 全部使用TypeScript书写，类型约束、IDE友好
 
 ## 组件
 
-- 数据缓存 [RedisCache](#数据缓存)
-- 队列消息 [RedisQueue](#队列消息) [RedisQueueWorker](#队列消息)
-- 定时任务 [RedisCron](#定时任务)
-- 分布式锁 [RedisLock](#分布式锁)
+- 数据缓存 [RedisCache](#数据缓存) 用于Key-Value类型的数据缓存
+- 消息队列 [RedisQueue](#消息队列) [RedisQueueWorker](#消息队列) 基于Redis实现轻量高效的消息队列
+- 定时任务 [RedisCron](#定时任务) 通过Cron表达式和消息队列按时执行任务
+- 分布式锁 [RedisLock](#分布式锁) 通过Redis实现基本的分布式锁机制
 
 ## 快速开始
 
@@ -127,7 +127,7 @@ const resultWarp2 = await redisCache.mWarp('module1', ['id301', 'id302'], (ids) 
 resultWarp2 // { id301: 0.32430600236596074, id302: 0.29829421673682566 }
 ```
 
-#### 队列消息
+#### 消息队列
 
 ```typescript
 // 定义一个队列名称和消息类型名称
