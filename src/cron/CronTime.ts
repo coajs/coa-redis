@@ -1,5 +1,5 @@
 import { CoaError } from 'coa-error'
-import { CoaRedisDic } from '../typings'
+import { CoaRedis } from '../typings'
 
 const name_map = ['second', 'minute', 'hour', 'date', 'month', 'day']
 const range_map = [
@@ -12,12 +12,12 @@ const range_map = [
 ]
 
 interface CronTimeFiedlds {
-  second: CoaRedisDic<boolean>
-  minute: CoaRedisDic<boolean>
-  hour: CoaRedisDic<boolean>
-  date: CoaRedisDic<boolean>
-  month: CoaRedisDic<boolean>
-  day: CoaRedisDic<boolean>
+  second: CoaRedis.Dic<boolean>
+  minute: CoaRedis.Dic<boolean>
+  hour: CoaRedis.Dic<boolean>
+  date: CoaRedis.Dic<boolean>
+  month: CoaRedis.Dic<boolean>
+  day: CoaRedis.Dic<boolean>
 }
 
 export class CronTime {

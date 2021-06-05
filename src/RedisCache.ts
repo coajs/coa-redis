@@ -1,13 +1,13 @@
 import { CoaError } from 'coa-error'
 import { _ } from 'coa-helper'
 import { RedisBin } from './RedisBin'
-import { CoaRedisCacheDelete, CoaRedisConfig, CoaRedisDic, Redis } from './typings'
+import { CoaRedis, Redis } from './typings'
 
 const ms_ttl = 30 * 24 * 3600 * 1000
 
 export class RedisCache {
   private readonly io: Redis.Redis
-  private readonly config: CoaRedisConfig
+  private readonly config: CoaRedis.Config
 
   constructor(bin: RedisBin) {
     this.io = bin.io
@@ -23,11 +23,11 @@ export class RedisCache {
   }
 
   // 批量设置
-  async mSet(nsp: string, values: CoaRedisDic<any>, ms: number = ms_ttl) {
+  async mSet(nsp: string, values: CoaRedis.Dic<any>, ms: number = ms_ttl) {
     ms > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
     _.keys(values).length > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash values值的数量 必须大于0')
     const expire = Date.now() + ms
-    const data: CoaRedisDic<any> = {}
+    const data: CoaRedis.Dic<any> = {}
     _.forEach(values, (v, k) => (data[k] = this.encode(v, expire)))
     return await this.io.hmset(this.key(nsp), data)
   }
@@ -41,7 +41,7 @@ export class RedisCache {
   // 批量获取
   async mGet(nsp: string, ids: string[]) {
     const ret = await this.io.hmget(this.key(nsp), ...ids)
-    const result: CoaRedisDic<any> = {}
+    const result: CoaRedis.Dic<any> = {}
     const time = _.now()
     _.forEach(ids, (id, i) => (result[id] = this.decode(ret[i], time)))
     return result
@@ -85,7 +85,7 @@ export class RedisCache {
   }
 
   // 删除
-  async mDelete(deleteIds: CoaRedisCacheDelete[]) {
+  async mDelete(deleteIds: CoaRedis.CacheDelete[]) {
     if (deleteIds.length === 0) return 0
     else if (deleteIds.length === 1) return await this.delete(...deleteIds[0])
 

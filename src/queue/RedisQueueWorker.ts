@@ -1,7 +1,7 @@
 import { echo } from 'coa-echo'
 import { $, _ } from 'coa-helper'
 import { RedisBin } from '../RedisBin'
-import { CoaRedisDic, Redis } from '../typings'
+import { CoaRedis, Redis } from '../typings'
 import { RedisQueue, RedisQueueKeys } from './RedisQueue'
 
 const sep = '^^'
@@ -13,7 +13,7 @@ export class RedisQueueWorker {
   private doingJob: string
   private retryAt: number
   private readonly keys: RedisQueueKeys
-  private readonly workers: CoaRedisDic<(id: string, data: object) => Promise<void>>
+  private readonly workers: CoaRedis.Dic<(id: string, data: object) => Promise<void>>
   private readonly bin: RedisBin
   private readonly io: Redis.Redis
   private readonly ioRead: Redis.Redis
