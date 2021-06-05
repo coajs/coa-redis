@@ -1,25 +1,24 @@
 import { echo } from 'coa-echo'
 import { $, _ } from 'coa-helper'
 import { RedisBin } from '../RedisBin'
-import { CoaRedis, Redis } from '../typings'
-import { RedisQueue } from './RedisQueue'
+import { CoaRedisDic, Redis } from '../typings'
+import { RedisQueue, RedisQueueKeys } from './RedisQueue'
 
 const sep = '^^'
 
 export class RedisQueueWorker {
-
   public readonly queue: RedisQueue
 
   private lock = false
   private doingJob: string
   private retryAt: number
-  private readonly keys: RedisQueue.Keys
-  private readonly workers: CoaRedis.Dic<(id: string, data: object) => Promise<void>>
+  private readonly keys: RedisQueueKeys
+  private readonly workers: CoaRedisDic<(id: string, data: object) => Promise<void>>
   private readonly bin: RedisBin
   private readonly io: Redis.Redis
   private readonly ioRead: Redis.Redis
 
-  constructor (queue: RedisQueue) {
+  constructor(queue: RedisQueue) {
     this.queue = queue
     this.bin = queue.bin
     this.keys = queue.keys
@@ -31,12 +30,14 @@ export class RedisQueueWorker {
   }
 
   // 初始化任务，interval为上报间隔，默认为10秒上报一次
-  async init (interval = 10e3) {
+  async init(interval = 10e3) {
     if (this.lock) return
     this.lock = true
 
     // 队列任务监听器
-    setInterval(() => this.interval().then().catch(_.noop), interval)
+    setInterval(() => {
+      this.interval().then(_.noop, _.noop)
+    }, interval)
 
     // 持续监听队列
     while (1) {
@@ -51,14 +52,13 @@ export class RedisQueueWorker {
   }
 
   // 添加新工作类型
-  on (name: string, worker: (id: string, data: object) => Promise<void>) {
+  on(name: string, worker: (id: string, data: object) => Promise<void>) {
     this.workers[name] = worker
     return this.queue.definePusher(name)
   }
 
   // 检查队列，force是否强制执行，timeout任务上报超时的时间，默认180秒，interval两次执行间隔，默认60秒
-  private async retry (force = false, timeout = 180e3, interval = 60e3) {
-
+  private async retry(force = false, timeout = 180e3, interval = 60e3) {
     const now = _.now()
     // 如果60秒内执行过且没有强制执行，则忽略
     const can = await this.io.set(this.keys.retrying, now, 'PX', interval, 'NX')
@@ -73,20 +73,23 @@ export class RedisQueueWorker {
       if (doing_map[jobId] > timeout) retryJobs.push(jobId)
     })
     // 遍历doing检查是否超时
-    _.forEach(doing, jobId => {
+    _.forEach(doing, (jobId) => {
       if (doing_map[jobId] === undefined || doing_map[jobId] > timeout) retryJobs.push(jobId)
     })
 
     // 如果存在需要重试的任务
     if (retryJobs.length) {
       const uniqJobIds = _.uniq(retryJobs)
-      await this.io.pipeline().hdel(this.keys.doing_map, ...uniqJobIds).lpush(this.keys.pending, ...uniqJobIds).exec()
+      await this.io
+        .pipeline()
+        .hdel(this.keys.doing_map, ...uniqJobIds)
+        .lpush(this.keys.pending, ...uniqJobIds)
+        .exec()
     }
   }
 
   // 开始工作
-  private async work (job: string) {
-
+  private async work(job: string) {
     // 准备执行
     const now = _.now()
     const can = await this.io.hsetnx(this.keys.doing_map, job, now)
@@ -120,16 +123,14 @@ export class RedisQueueWorker {
   }
 
   // 定时检查
-  private async interval () {
+  private async interval() {
     const now = _.now()
     // 如果当前有正在执行的任务，报告最新时间
-    if (this.doingJob)
-      await this.io.hset(this.keys.doing_map, this.doingJob, now)
+    if (this.doingJob) await this.io.hset(this.keys.doing_map, this.doingJob, now)
     // 每隔60秒重试
     if (now - this.retryAt > 60e3) {
-      this.retry().then()
+      this.retry().then(_.noop, _.noop)
       this.retryAt = now
     }
   }
-
 }

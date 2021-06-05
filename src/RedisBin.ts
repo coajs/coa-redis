@@ -1,13 +1,11 @@
 import { echo } from 'coa-echo'
-import { CoaRedis, Redis } from './typings'
+import { CoaRedisConfig, Redis } from './typings'
 
 export class RedisBin {
-
   public io: Redis.Redis
-  public config: CoaRedis.Config
+  public config: CoaRedisConfig
 
-  constructor (config: CoaRedis.Config) {
-
+  constructor(config: CoaRedisConfig) {
     this.config = config
     this.io = new Redis({
       port: config.port,
@@ -17,10 +15,11 @@ export class RedisBin {
       lazyConnect: true,
     })
 
-    config.trace && this.io.monitor((err, monitor) => {
-      monitor.on('monitor', (time, args, source, database) => {
-        echo.grey('* Redis: [%s] %s', database, args)
+    config.trace &&
+      this.io.monitor((_err, monitor) => {
+        monitor.on('monitor', (time, args, source, database) => {
+          echo.grey('* Redis: [%s] %s', database, args)
+        })
       })
-    })
   }
 }

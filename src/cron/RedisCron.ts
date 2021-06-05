@@ -1,41 +1,40 @@
 import { echo } from 'coa-echo'
 import { _ } from 'coa-helper'
 import { RedisQueueWorker } from '../queue/RedisQueueWorker'
-import { CoaRedis, Redis } from '../typings'
+import { CoaRedisDic, Redis } from '../typings'
 import { CronTime } from './CronTime'
 
 const D = { series: 0 }
 
 export class RedisCron {
-
-  private readonly times: CoaRedis.Dic<string>
-  private readonly workers: CoaRedis.Dic<() => Promise<void>>
+  private readonly times: CoaRedisDic<string>
+  private readonly workers: CoaRedisDic<() => Promise<void>>
   private readonly push: (id: string, data: object) => Promise<number>
 
   private readonly version: string
   private readonly key_cron_last: string
   private readonly io: Redis.Redis
 
-  constructor (worker: RedisQueueWorker, version: string) {
+  constructor(worker: RedisQueueWorker, version: string) {
     this.times = {}
     this.workers = {}
-    this.push = worker.on('CRON', id => this.work(id))
+    this.push = worker.on('CRON', async (id) => await this.work(id))
     this.key_cron_last = worker.queue.keys.prefix + 'cron-last'
     this.version = version || ''
     this.io = worker.queue.bin.io
   }
 
   // 添加日程计划
-  on (time: string, worker: () => Promise<void>) {
+  on(time: string, worker: () => Promise<void>) {
     const id = `${this.version}-${++D.series}`
     this.times[id] = time
     this.workers[id] = worker
   }
 
   // 尝试触发
-  async try () {
+  async try() {
     const deadline = _.now()
-    const start = _.toInteger(await this.io.getset(this.key_cron_last, deadline)) || (deadline - 1000)
+    const start = _.toInteger(await this.io.getset(this.key_cron_last, deadline)) || deadline - 1000
     _.forEach(this.times, (time, id) => {
       const next = new CronTime(time, { start, deadline }).next()
       next && this.push(id, {})
@@ -43,7 +42,7 @@ export class RedisCron {
   }
 
   // 开始执行
-  private async work (id: string) {
+  private async work(id: string) {
     const worker = this.workers[id]
     if (worker) {
       try {
