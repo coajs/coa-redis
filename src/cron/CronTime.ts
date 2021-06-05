@@ -25,11 +25,15 @@ export class CronTime {
   deadline: number
   fields: CronTimeFiedlds = { second: {}, minute: {}, hour: {}, date: {}, month: {}, day: {} }
 
-  // 默认结束时间为2099年
+  // 默认结束时间为2099年，左开右闭
   constructor(expression: string, option: { start?: number; deadline?: number } = {}) {
     // 默认开始时间为当前，默认截止时间为2099年
     this.start = option.start ?? Date.now()
     this.deadline = option.deadline ?? 4070880000000
+
+    // 删除毫秒，同时开始时间加一秒，保证内部都是左闭右闭
+    this.start = Math.floor(this.start / 1000) * 1000 + 1000
+    this.deadline = Math.floor(this.deadline / 1000) * 1000
 
     // 开始解析表达式
     this.parse(expression)
@@ -37,9 +41,9 @@ export class CronTime {
 
   // 检查下一个有效时间段
   next() {
-    while (this.start < this.deadline) {
-      this.start += 1000
+    while (this.start <= this.deadline) {
       const date = this.check(this.start)
+      this.start += 1000
       if (date) return date
     }
   }
