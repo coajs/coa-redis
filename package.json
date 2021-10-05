@@ -2,11 +2,7 @@
   "name": "coa-redis",
   "version": "0.0.0",
   "description": "redis component for coa",
-  "keywords": [
-    "coajs",
-    "coa",
-    "redis"
-  ],
+  "keywords": ["coajs", "coa", "redis"],
   "license": "MIT",
   "author": "Aex",
   "homepage": "https://github.com/coajs/coa-redis",
@@ -20,7 +16,7 @@
     "test:dev": "mocha dist/test --watch",
     "build": "rm -rf dist && tsc && cp package.json *.md dist/src",
     "lint": "eslint .",
-    "prettier": "prettier -w .",
+    "format": "prettier -w .",
     "sync": "curl -X PUT 'https://npm.taobao.org/sync/coa-redis?sync_upstream=true'"
   },
   "dependencies": {

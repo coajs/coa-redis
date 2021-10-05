@@ -9,7 +9,10 @@ const D = { series: 0 }
 export class RedisCron {
   private readonly times: CoaRedis.Dic<string>
   private readonly workers: CoaRedis.Dic<() => Promise<void>>
-  private readonly pusher: (id: string, data: object) => Promise<number>
+  private readonly pusher: (
+    id: string,
+    data: Record<string, any>
+  ) => Promise<number>
 
   private readonly version: string
   private readonly key_cron_last: string
@@ -34,7 +37,9 @@ export class RedisCron {
   // 尝试触发
   async try() {
     const deadline = _.now()
-    const start = _.toInteger(await this.io.getset(this.key_cron_last, deadline)) || deadline - 1000
+    const start =
+      _.toInteger(await this.io.getset(this.key_cron_last, deadline)) ||
+      deadline - 1000
     _.forEach(this.times, (time, id) => {
       const next = new CronTime(time, { start, deadline }).next()
       next && this.pusher(id, {})
@@ -47,7 +52,7 @@ export class RedisCron {
     if (worker) {
       try {
         await worker()
-      } catch (e) {
+      } catch (e: any) {
         echo.error('* Cron JobError: %s %s', id, this.times[id], e.toString())
       }
     } else {

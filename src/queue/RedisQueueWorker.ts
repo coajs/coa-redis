@@ -13,7 +13,9 @@ export class RedisQueueWorker {
   private doingJob: string
   private retryAt: number
   private readonly keys: RedisQueueKeys
-  private readonly workers: CoaRedis.Dic<(id: string, data: object) => Promise<void>>
+  private readonly workers: CoaRedis.Dic<
+    (id: string, data: Record<string, any>) => Promise<void>
+  >
   private readonly bin: RedisBin
   private readonly io: Redis.Redis
   private readonly ioRead: Redis.Redis
@@ -40,9 +42,14 @@ export class RedisQueueWorker {
     }, interval)
 
     // 持续监听队列
-    while (1) {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
       try {
-        const key = await this.ioRead.brpoplpush(this.keys.pending, this.keys.doing, 0)
+        const key = await this.ioRead.brpoplpush(
+          this.keys.pending,
+          this.keys.doing,
+          0
+        )
         await this.work(key)
       } catch (e) {
         echo.error('* QueueError:', e)
@@ -52,7 +59,10 @@ export class RedisQueueWorker {
   }
 
   // 添加新工作类型
-  on(name: string, worker: (id: string, data: object) => Promise<void>) {
+  on(
+    name: string,
+    worker: (id: string, data: Record<string, any>) => Promise<void>
+  ) {
     this.workers[name] = worker
     return this.queue.definePusher(name)
   }
@@ -64,7 +74,11 @@ export class RedisQueueWorker {
     const can = await this.io.set(this.keys.retrying, now, 'PX', interval, 'NX')
     if (!can && !force) return
 
-    const [[, doing = []], [, doing_map = {}]] = await this.io.pipeline().lrange(this.keys.doing, 0, -1).hgetall(this.keys.doing_map).exec()
+    const [[, doing = []], [, doing_map = {}]] = await this.io
+      .pipeline()
+      .lrange(this.keys.doing, 0, -1)
+      .hgetall(this.keys.doing_map)
+      .exec()
     const retryJobs = [] as string[]
 
     // 遍历map检查是否超时
@@ -74,7 +88,8 @@ export class RedisQueueWorker {
     })
     // 遍历doing检查是否超时
     _.forEach(doing, (jobId) => {
-      if (doing_map[jobId] === undefined || doing_map[jobId] > timeout) retryJobs.push(jobId)
+      if (doing_map[jobId] === undefined || doing_map[jobId] > timeout)
+        retryJobs.push(jobId)
     })
 
     // 如果存在需要重试的任务
@@ -109,7 +124,7 @@ export class RedisQueueWorker {
     if (worker) {
       try {
         await worker(id, JSON.parse(data))
-      } catch (e) {
+      } catch (e: any) {
         echo.error('* Queue JobError: %s %s', job, e.toString())
       }
     } else {
@@ -118,7 +133,11 @@ export class RedisQueueWorker {
 
     // 执行结束
     this.doingJob = ''
-    await this.io.pipeline().hdel(this.keys.doing_map, job).lrem(this.keys.doing, 0, job).exec()
+    await this.io
+      .pipeline()
+      .hdel(this.keys.doing_map, job)
+      .lrem(this.keys.doing, 0, job)
+      .exec()
     echo.grey('* Queue: job %s completed in %sms', job, _.now() - now)
   }
 
@@ -126,7 +145,8 @@ export class RedisQueueWorker {
   private async interval() {
     const now = _.now()
     // 如果当前有正在执行的任务，报告最新时间
-    if (this.doingJob) await this.io.hset(this.keys.doing_map, this.doingJob, now)
+    if (this.doingJob)
+      await this.io.hset(this.keys.doing_map, this.doingJob, now)
     // 每隔60秒重试
     if (now - this.retryAt > 60e3) {
       this.retry().then(_.noop, _.noop)

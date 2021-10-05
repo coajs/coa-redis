@@ -33,7 +33,7 @@ export class RedisQueue {
   }
 
   // 推送新任务
-  public async push(name: string, id: string, data: object) {
+  public async push(name: string, id: string, data: Record<string, any>) {
     const job = name + sep + id + sep + JSON.stringify(data)
     echo.grey('* Queue: push new job %s', job)
     return await this.io.lpush(this.keys.pending, job)
@@ -41,6 +41,7 @@ export class RedisQueue {
 
   // 定义一个新的推送者
   definePusher(name: string) {
-    return async (id: string, data: object) => await this.push(name, id, data)
+    return async (id: string, data: Record<string, any>) =>
+      await this.push(name, id, data)
   }
 }

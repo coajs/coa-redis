@@ -111,7 +111,7 @@ export class RedisCache {
   }
 
   // 清除指定命名空间的缓存
-  async clear(nsp: string = '') {
+  async clear(nsp = '') {
     const keys = await this.io.keys(this.key(nsp + '*'))
     return keys.length ? await this.io.del(...keys) : 0
   }
