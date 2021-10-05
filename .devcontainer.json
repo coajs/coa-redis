@@ -2,10 +2,7 @@
 // https://github.com/microsoft/vscode-dev-containers/tree/main/containers/javascript-node
 {
   "name": "coajs",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "args": { "VARIANT": "12-bullseye" }
-  },
+  "image": "ghcr.io/coajs/javascript-node-docker:16",
   "runArgs": ["--init"],
   "overrideCommand": false,
   "mounts": [
