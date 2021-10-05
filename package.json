@@ -24,11 +24,11 @@
     "sync": "curl -X PUT 'https://npm.taobao.org/sync/coa-redis?sync_upstream=true'"
   },
   "dependencies": {
-    "@types/ioredis": "^4.26.4",
+    "@types/ioredis": "^4.27.6",
     "coa-echo": "^1.2.1",
     "coa-error": "^1.5.2",
     "coa-helper": "^1.2.1",
-    "ioredis": "^4.27.6"
+    "ioredis": "^4.27.10"
   },
   "devDependencies": {
     "@types/chai": "^4.2.22",
