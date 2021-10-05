@@ -4,13 +4,13 @@
   "name": "coajs",
   "build": {
     "dockerfile": "Dockerfile",
-    "args": { "VARIANT": "16-bullseye" }
+    "args": { "VARIANT": "12-bullseye" }
   },
+  "runArgs": ["--init"],
   "overrideCommand": false,
-  "runArgs": ["--init", "--privileged"],
   "mounts": [
-    "source=container-share-cache,target=/usr/local/share/.cache",
-    "source=container-lib-docker,target=/var/lib/docker"
+    "source=container-share-cache,target=/usr/local/share/.cache,type=volume",
+    "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
   ],
   "extensions": [
     "mutantdino.resourcemonitor",
