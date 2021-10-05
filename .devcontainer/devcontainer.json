@@ -1,20 +1,23 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/main/containers/javascript-node
 {
-	"name": "coajs",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": { "VARIANT": "12" }
-	},
-	"overrideCommand": false,
-	"runArgs": ["--init", "--privileged"],
-	"mounts": ["source=container-share-cache,target=/usr/local/share/.cache","source=container-lib-docker,target=/var/lib/docker"],
-	"extensions": [
-		"mutantdino.resourcemonitor",
-		"github.vscode-pull-request-github",
-		"eamodio.gitlens",
-		"esbenp.prettier-vscode",
-		"dbaeumer.vscode-eslint",
-		"visualstudioexptteam.vscodeintellicode"
-	]
+  "name": "coajs",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": { "VARIANT": "16-bullseye" }
+  },
+  "overrideCommand": false,
+  "runArgs": ["--init", "--privileged"],
+  "mounts": [
+    "source=container-share-cache,target=/usr/local/share/.cache",
+    "source=container-lib-docker,target=/var/lib/docker"
+  ],
+  "extensions": [
+    "mutantdino.resourcemonitor",
+    "github.vscode-pull-request-github",
+    "eamodio.gitlens",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "visualstudioexptteam.vscodeintellicode"
+  ]
 }

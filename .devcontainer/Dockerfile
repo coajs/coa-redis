@@ -4,9 +4,11 @@
 ARG VARIANT="16-bullseye"
 FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
 
+COPY library-scripts/*.sh /tmp/library-scripts/
+
 # Docker-in-Docker Install Script
 # https://github.com/microsoft/vscode-dev-containers/blob/main/script-library/docs/docker-in-docker.md
-COPY library-scripts/*.sh /tmp/library-scripts/
+ENV DOCKER_BUILDKIT=1
 RUN apt-get update && /bin/bash /tmp/library-scripts/docker-in-docker-debian.sh
 ENTRYPOINT ["/usr/local/share/docker-init.sh"]
 VOLUME [ "/var/lib/docker" ]
