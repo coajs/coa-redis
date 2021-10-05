@@ -44,7 +44,7 @@ fi
 # Get central common setting
 get_common_setting() {
     if [ "${common_settings_file_loaded}" != "true" ]; then
-        curl -sfL "https://aka.ms/vscode-dev-containers/script-library/settings.env" 2>/dev/null -o /tmp/vsdc-settings.env || echo "Could not download settings file. Skipping."
+        curl -ksfL "https://aka.ms/vscode-dev-containers/script-library/settings.env" 2>/dev/null -o /tmp/vsdc-settings.env || echo "Could not download settings file. Skipping."
         common_settings_file_loaded=true
     fi
     if [ -f "/tmp/vsdc-settings.env" ]; then
@@ -129,14 +129,14 @@ else
     if [ "${USE_MOBY}" = "true" ]; then
         # Import key safely (new 'signed-by' method rather than deprecated apt-key approach) and install
         get_common_setting MICROSOFT_GPG_KEYS_URI
-        curl -sSL ${MICROSOFT_GPG_KEYS_URI} | gpg --dearmor > /usr/share/keyrings/microsoft-archive-keyring.gpg
+        curl -ksSL ${MICROSOFT_GPG_KEYS_URI} | gpg --dearmor > /usr/share/keyrings/microsoft-archive-keyring.gpg
         echo "deb [arch=${architecture} signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/repos/microsoft-${ID}-${VERSION_CODENAME}-prod ${VERSION_CODENAME} main" > /etc/apt/sources.list.d/microsoft.list
         apt-get update
         apt-get -y install --no-install-recommends moby-cli moby-buildx moby-engine
         apt-get -y install --no-install-recommends moby-compose || echo "(*) Package moby-compose (Docker Compose v2) not available for ${VERSION_CODENAME} ${architecture}. Skipping."
     else
         # Import key safely (new 'signed-by' method rather than deprecated apt-key approach) and install
-        curl -fsSL https://download.docker.com/linux/${ID}/gpg | gpg --dearmor > /usr/share/keyrings/docker-archive-keyring.gpg
+        curl -kfsSL https://download.docker.com/linux/${ID}/gpg | gpg --dearmor > /usr/share/keyrings/docker-archive-keyring.gpg
         echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${ID} ${VERSION_CODENAME} stable" > /etc/apt/sources.list.d/docker.list
         apt-get update
         apt-get -y install --no-install-recommends docker-ce-cli
@@ -172,7 +172,7 @@ else
     else 
         find_version_from_git_tags DOCKER_DASH_COMPOSE_VERSION "https://github.com/docker/compose" "tags/"
         echo "(*) Installing docker-compose ${DOCKER_DASH_COMPOSE_VERSION}..."
-        curl -fsSL "https://github.com/docker/compose/releases/download/${DOCKER_DASH_COMPOSE_VERSION}/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
+        curl -kfsSL "https://github.com/docker/compose/releases/download/${DOCKER_DASH_COMPOSE_VERSION}/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
         chmod +x /usr/local/bin/docker-compose
     fi
 fi
