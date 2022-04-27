@@ -76,13 +76,17 @@ export class RedisLock {
     })
   }
 
-  //设置锁成功 执行 promise 否则 返回 undefined
-  async once<T>(id: string, worker: () => Promise<T>, ms = 2000) {
+  // 尝试一次性事务，如果已经上锁则不执行
+  async once<T>(id: string, worker: () => Promise<T>, ms = 10000) {
     const lock = new Lock(this.bin, id, ms)
-    // set px nx key 成功 执行work
+    // 判断是否能锁上，能锁上再执行
     if (await lock.lock()) {
-      return await worker()
+      return await worker().catch(() => {
+        // 如果报错，则释放锁
+        lock.unlock().then(_.noop, _.noop)
+      })
     } else {
+      // 已经上锁则直接返回
       return undefined
     }
   }
