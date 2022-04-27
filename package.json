@@ -2,7 +2,11 @@
   "name": "coa-redis",
   "version": "0.0.0",
   "description": "redis component for coa",
-  "keywords": ["coajs", "coa", "redis"],
+  "keywords": [
+    "coajs",
+    "coa",
+    "redis"
+  ],
   "license": "MIT",
   "author": "Aex",
   "homepage": "https://github.com/coajs/coa-redis",

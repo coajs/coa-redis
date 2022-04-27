@@ -85,7 +85,10 @@ describe('CronTime class test', function () {
     let current = start
 
     while (current + inteval <= deadline) {
-      const cronTime = new CronTime('* * * * * *', { start: current, deadline: current + inteval })
+      const cronTime = new CronTime('* * * * * *', {
+        start: current,
+        deadline: current + inteval,
+      })
       const next = cronTime.next()
       if (next) times++
       current += inteval

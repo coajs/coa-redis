@@ -23,7 +23,14 @@ interface CronTimeFiedlds {
 export class CronTime {
   start: number
   deadline: number
-  fields: CronTimeFiedlds = { second: {}, minute: {}, hour: {}, date: {}, month: {}, day: {} }
+  fields: CronTimeFiedlds = {
+    second: {},
+    minute: {},
+    hour: {},
+    date: {},
+    month: {},
+    day: {},
+  }
 
   // 默认结束时间为2099年，左开右闭
   constructor(expression: string, option: { start?: number; deadline?: number } = {}) {

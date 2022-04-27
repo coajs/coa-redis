@@ -69,6 +69,21 @@ export class RedisLock {
     })
   }
 
+  // 尝试一次性事务，如果已经上锁则不执行
+  async once<T>(id: string, worker: () => Promise<T>, ms = 10000) {
+    const lock = new Lock(this.bin, id, ms)
+    // 判断是否能锁上，能锁上再执行
+    if (await lock.lock()) {
+      return await worker().catch(() => {
+        // 如果报错，则释放锁
+        lock.unlock().then(_.noop, _.noop)
+      })
+    } else {
+      // 已经上锁则直接返回
+      return undefined
+    }
+  }
+
   // 节流事务，限制执行频率
   async throttle<T>(id: string, worker: () => Promise<T>, ms: number) {
     const lock = new Lock(this.bin, id, ms)

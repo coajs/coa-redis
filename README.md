@@ -69,12 +69,7 @@ const redisCache = new RedisCache(redisBin)
 // Generally, the module name can be used as nsp, and the data between each nsp is isolated from each other.
 
 // Set cache data
-await redisCache.set(
-  'module1',
-  'id001',
-  'value001',
-  5 * 60 * 1000 /*5 minutes*/
-) // 1
+await redisCache.set('module1', 'id001', 'value001', 5 * 60 * 1000 /*5 minutes*/) // 1
 
 // Read cache data
 await redisCache.get('module1', 'id001') // value001
@@ -87,16 +82,8 @@ Batch operate
 
 ```typescript
 // Batch set cache data
-await redisCache.mSet(
-  'module1',
-  { id101: 'value101' },
-  5 * 60 * 1000 /*5 minutes*/
-) // 1
-await redisCache.mSet(
-  'module2',
-  { id201: 'value201', id202: { name: 'A2', title: 'a2' } },
-  5 * 60 * 1000 /*5 minutes*/
-) // 2
+await redisCache.mSet('module1', { id101: 'value101' }, 5 * 60 * 1000 /*5 minutes*/) // 1
+await redisCache.mSet('module2', { id201: 'value201', id202: { name: 'A2', title: 'a2' } }, 5 * 60 * 1000 /*5 minutes*/) // 2
 
 // Batch read cache data
 await redisCache.mGet('module1', ['id101']) // 'value101'
@@ -140,7 +127,7 @@ async function getAndSetCache(nsp: string, id: string) {
 const resultWarp2 = await redisCache.mWarp(
   'module1',
   ['id301', 'id302'],
-  (ids) => {
+  ids => {
     const result = {} as { [id: string]: number }
     for (const id of ids) {
       // Do something here
