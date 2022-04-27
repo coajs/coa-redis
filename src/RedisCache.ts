@@ -62,13 +62,13 @@ export class RedisCache {
     const result = force ? {} : await this.mGet(nsp, ids)
 
     const newIds = [] as string[]
-    _.forEach(ids, (id) => {
+    _.forEach(ids, id => {
       if (result[id] === undefined) newIds.push(id)
     })
 
     if (newIds.length) {
       const newResult = (await worker(newIds)) as any
-      _.forEach(newIds, (id) => {
+      _.forEach(newIds, id => {
         if (!newResult[id]) newResult[id] = null
       })
       ms > 0 && (await this.mSet(nsp, newResult, ms))

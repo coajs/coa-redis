@@ -18,7 +18,7 @@ export class RedisCron {
   constructor(worker: RedisQueueWorker, version: string) {
     this.times = {}
     this.workers = {}
-    this.pusher = worker.on('CRON', async (id) => await this.work(id))
+    this.pusher = worker.on('CRON', async id => await this.work(id))
     this.key_cron_last = worker.queue.keys.prefix + 'cron-last'
     this.version = version || ''
     this.io = worker.queue.bin.io

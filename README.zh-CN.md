@@ -127,7 +127,7 @@ async function getAndSetCache(nsp: string, id: string) {
 const resultWarp2 = await redisCache.mWarp(
   'module1',
   ['id301', 'id302'],
-  (ids) => {
+  ids => {
     const result = {} as { [id: string]: number }
     for (const id of ids) {
       // 这里做一些事情
