@@ -72,7 +72,7 @@ export class RedisLock {
   //设置锁成功 执行 promise 否则 返回 undefined
   async once<T>(id: string, worker: () => Promise<T>, ms = 2000) {
     const lock = new Lock(this.bin, id, ms)
-    // set px nx key 成功 执行work 否则返回指定的 failVal
+    // set px nx key 成功 执行work
     if(await lock.lock()){
       return await worker()
     }else{
