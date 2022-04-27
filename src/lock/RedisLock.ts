@@ -30,7 +30,9 @@ class Lock {
   }
 
   async unlock() {
-    return (await this.io.get(this.id)) === this.value ? await this.io.del(this.id) : -1
+    return (await this.io.get(this.id)) === this.value
+      ? await this.io.del(this.id)
+      : -1
   }
 }
 
@@ -42,7 +44,12 @@ export class RedisLock {
   }
 
   // 开始共享阻塞锁事务
-  async start<T>(id: string, worker: () => Promise<T>, ms = 2000, interval = 200) {
+  async start<T>(
+    id: string,
+    worker: () => Promise<T>,
+    ms = 2000,
+    interval = 200
+  ) {
     const lock = new Lock(this.bin, id, ms)
 
     // 判断是否能锁上，如果不能锁上，则等待锁被释放
@@ -73,10 +80,10 @@ export class RedisLock {
   async once<T>(id: string, worker: () => Promise<T>, ms = 2000) {
     const lock = new Lock(this.bin, id, ms)
     // set px nx key 成功 执行work
-    if(await lock.lock()){
+    if (await lock.lock()) {
       return await worker()
-    }else{
-      return undefined;
+    } else {
+      return undefined
     }
   }
 

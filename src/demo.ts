@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 // @ts-nocheck
-import { RedisBin, RedisCache, RedisLock, RedisQueue, RedisQueueWorker } from '.'
+import {
+  RedisBin,
+  RedisCache,
+  RedisLock,
+  RedisQueue,
+  RedisQueueWorker,
+} from '.'
 
 const redisConfig = {
   // 服务器地址
@@ -30,7 +36,12 @@ const redisCache = new RedisCache(redisBin)
 
 // 设置缓存数据
 await redisCache.set('module1', 'id001', 'value001', 5 * 60 * 1000 /* 5分钟 */) // 1
-await redisCache.set('module1', 'id002', { name: 'A', title: 'a' }, 5 * 60 * 1000 /* 5分钟 */) // 1
+await redisCache.set(
+  'module1',
+  'id002',
+  { name: 'A', title: 'a' },
+  5 * 60 * 1000 /* 5分钟 */
+) // 1
 
 // 读取缓存数据
 await redisCache.get('module1', 'id001') // 'value001'
@@ -40,8 +51,16 @@ await redisCache.get('module1', 'id002') // { name: 'A', title: 'a' }
 await redisCache.delete('module1', ['id001', 'id002']) // 2
 
 // 批量设置缓存数据
-await redisCache.mSet('module1', { id101: 'value101' }, 5 * 60 * 1000 /* 5分钟 */) // 1
-await redisCache.mSet('module2', { id201: 'value201', id202: { name: 'A2', title: 'a2' } }, 5 * 60 * 1000 /* 5分钟 */) // 2
+await redisCache.mSet(
+  'module1',
+  { id101: 'value101' },
+  5 * 60 * 1000 /* 5分钟 */
+) // 1
+await redisCache.mSet(
+  'module2',
+  { id201: 'value201', id202: { name: 'A2', title: 'a2' } },
+  5 * 60 * 1000 /* 5分钟 */
+) // 2
 
 // 批量读取缓存数据
 await redisCache.mGet('module1', ['id101']) // 'value101'
