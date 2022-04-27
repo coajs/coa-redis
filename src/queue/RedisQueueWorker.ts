@@ -65,11 +65,7 @@ export class RedisQueueWorker {
     const can = await this.io.set(this.keys.retrying, now, 'PX', interval, 'NX')
     if (!can && !force) return
 
-    const [[, doing = []], [, doing_map = {}]] = await this.io
-      .pipeline()
-      .lrange(this.keys.doing, 0, -1)
-      .hgetall(this.keys.doing_map)
-      .exec()
+    const [[, doing = []], [, doing_map = {}]] = await this.io.pipeline().lrange(this.keys.doing, 0, -1).hgetall(this.keys.doing_map).exec()
     const retryJobs = [] as string[]
 
     // 遍历map检查是否超时
