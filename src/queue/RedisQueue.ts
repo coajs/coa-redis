@@ -41,7 +41,6 @@ export class RedisQueue {
 
   // 定义一个新的推送者
   definePusher(name: string) {
-    return async (id: string, data: Record<string, any>) =>
-      await this.push(name, id, data)
+    return async (id: string, data: Record<string, any>) => await this.push(name, id, data)
   }
 }

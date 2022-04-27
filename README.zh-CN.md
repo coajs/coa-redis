@@ -83,11 +83,7 @@ await redisCache.delete('module1', ['id001', 'id002']) // 2
 ```typescript
 // 批量设置缓存数据
 await redisCache.mSet('module1', { id101: 'value101' }, 5 * 60 * 1000 /*5分钟*/) // 1
-await redisCache.mSet(
-  'module2',
-  { id201: 'value201', id202: { name: 'A2', title: 'a2' } },
-  5 * 60 * 1000 /*5分钟*/
-) // 2
+await redisCache.mSet('module2', { id201: 'value201', id202: { name: 'A2', title: 'a2' } }, 5 * 60 * 1000 /*5分钟*/) // 2
 
 // 批量读取缓存数据
 await redisCache.mGet('module1', ['id101']) // 'value101'

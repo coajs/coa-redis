@@ -16,8 +16,7 @@ export class RedisCache {
 
   // 设置
   async set(nsp: string, id: string, value: any, ms: number = ms_ttl) {
-    ms > 0 ||
-      CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
+    ms > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
     const expire = _.now() + ms
     const data = this.encode(value, expire)
     return await this.io.hset(this.key(nsp), id, data)
@@ -25,13 +24,8 @@ export class RedisCache {
 
   // 批量设置
   async mSet(nsp: string, values: CoaRedis.Dic<any>, ms: number = ms_ttl) {
-    ms > 0 ||
-      CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
-    _.keys(values).length > 0 ||
-      CoaError.throw(
-        'RedisCache.InvalidParam',
-        'cache hash values值的数量 必须大于0'
-      )
+    ms > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash ms 必须大于0')
+    _.keys(values).length > 0 || CoaError.throw('RedisCache.InvalidParam', 'cache hash values值的数量 必须大于0')
     const expire = Date.now() + ms
     const data: CoaRedis.Dic<any> = {}
     _.forEach(values, (v, k) => (data[k] = this.encode(v, expire)))
@@ -54,13 +48,7 @@ export class RedisCache {
   }
 
   // 获取
-  async warp<T>(
-    nsp: string,
-    id: string,
-    worker: () => Promise<T>,
-    ms = ms_ttl,
-    force = false
-  ) {
+  async warp<T>(nsp: string, id: string, worker: () => Promise<T>, ms = ms_ttl, force = false) {
     let result = force ? undefined : await this.get(nsp, id)
     if (result === undefined) {
       result = await worker()
@@ -70,13 +58,7 @@ export class RedisCache {
   }
 
   // 获取
-  async mWarp<T>(
-    nsp: string,
-    ids: string[],
-    worker: (ids: string[]) => Promise<T>,
-    ms = ms_ttl,
-    force = false
-  ) {
+  async mWarp<T>(nsp: string, ids: string[], worker: (ids: string[]) => Promise<T>, ms = ms_ttl, force = false) {
     const result = force ? {} : await this.mGet(nsp, ids)
 
     const newIds = [] as string[]
@@ -109,9 +91,7 @@ export class RedisCache {
 
     const pipeline = this.io.pipeline()
     deleteIds.forEach(([nsp, ids]) => {
-      ids.length
-        ? pipeline.hdel(this.key(nsp), ...ids)
-        : pipeline.del(this.key(nsp))
+      ids.length ? pipeline.hdel(this.key(nsp), ...ids) : pipeline.del(this.key(nsp))
     })
     return await pipeline.exec()
   }

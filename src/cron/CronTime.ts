@@ -33,10 +33,7 @@ export class CronTime {
   }
 
   // 默认结束时间为2099年，左开右闭
-  constructor(
-    expression: string,
-    option: { start?: number; deadline?: number } = {}
-  ) {
+  constructor(expression: string, option: { start?: number; deadline?: number } = {}) {
     // 默认开始时间为当前，默认截止时间为2099年
     this.start = option.start ?? Date.now()
     this.deadline = option.deadline ?? 4070880000000
@@ -73,8 +70,7 @@ export class CronTime {
   // 解析表达式
   private parse(expression: string) {
     const split = expression.trim().split(/\s+/)
-    split.length === 6 ||
-      CoaError.throw('CronTime.InvalidExpression', `Cron表达式有误，只能有6项`)
+    split.length === 6 || CoaError.throw('CronTime.InvalidExpression', `Cron表达式有误，只能有6项`)
     split.forEach((v, i) => this.parseField(v, i))
   }
 
@@ -84,24 +80,17 @@ export class CronTime {
     const name = name_map[index]
 
     field = field.replace(/\*/g, min + '-' + max)
-    field = field.replace(
-      /(\d+?)(?:-(\d+?))?(?:\/(\d+?))?(?:,|$)/g,
-      (s, left, right, step) => {
-        left = Math.max(min, parseInt(left))
-        right = right ? Math.min(max, parseInt(right)) : left
-        step = parseInt(step) || 1
+    field = field.replace(/(\d+?)(?:-(\d+?))?(?:\/(\d+?))?(?:,|$)/g, (s, left, right, step) => {
+      left = Math.max(min, parseInt(left))
+      right = right ? Math.min(max, parseInt(right)) : left
+      step = parseInt(step) || 1
 
-        for (; left <= right; left += step) {
-          ;(this.fields as any)[name][left] = true
-        }
-        return ''
+      for (; left <= right; left += step) {
+        ;(this.fields as any)[name][left] = true
       }
-    )
+      return ''
+    })
 
-    field === '' ||
-      CoaError.throw(
-        'CronTime.InvalidExpressionField',
-        `Cron表达式第${index + 1}项${field}有误`
-      )
+    field === '' || CoaError.throw('CronTime.InvalidExpressionField', `Cron表达式第${index + 1}项${field}有误`)
   }
 }
