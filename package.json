@@ -15,7 +15,7 @@
     "url": "https://github.com/coajs/coa-redis.git"
   },
   "scripts": {
-    "dev": "tsc -w",
+    "tsc": "tsc -w",
     "test": "mocha dist/test",
     "test:dev": "mocha dist/test --watch",
     "build": "rm -rf dist && tsc && cp package.json *.md dist/src",

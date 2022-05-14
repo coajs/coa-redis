@@ -97,17 +97,31 @@ export class RedisCache {
   }
 
   // 清除无效的缓存
-  async clearUseless() {
+  async clearUseless(match = '*') {
     const now = _.now()
-    const keys1 = await this.io.keys(this.key('*'))
+    const keys1 = await this.io.keys(this.key(match))
+    const result = {} as Record<string, [number, number]>
+    // 循环处理每一个key
     for (const key1 of keys1) {
+      // 按1000分组
       const keys2 = await this.io.hkeys(key1)
-      for (const key2 of keys2) {
-        const value = (await this.io.hget(key1, key2)) ?? ''
-        const expire = _.toInteger(value.substr(1, 13))
-        if (expire < now) await this.io.hdel(key1, key2)
+      const keys2Chunks = _.chunk(keys2, 1000)
+      result[key1] = [0, keys2.length]
+      for (const keys2 of keys2Chunks) {
+        // 批量获取
+        const values = await this.io.hmget(key1, keys2)
+        const deleteIds = [] as string[]
+        // 判断是否过期
+        _.forEach(values, (value, index) => {
+          const expire = _.toInteger((value || '').substring(1, 14))
+          if (expire < now) deleteIds.push(keys2[index])
+        })
+        // 删除过期的
+        if (deleteIds.length) await this.io.hdel(key1, ...deleteIds)
+        result[key1][0] += deleteIds.length
       }
     }
+    return result
   }
 
   // 清除指定命名空间的缓存
