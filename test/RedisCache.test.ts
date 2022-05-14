@@ -25,7 +25,7 @@ const redisCache = new RedisCache(redisBin)
 
 const nsp1 = 'NSP_1'
 
-describe.only('RedisCache class test', function () {
+describe('RedisCache class test', function () {
   it('init data', async () => {
     await redisCache.mSet(nsp1, { a: 1, b: 2, c: 3 }, 1)
     await redisCache.mSet(nsp1, { a1: 1, b1: 2, c1: 3 }, 10)
